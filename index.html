@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShiftMaster AI — ערוץ 14</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #0a0f0d;
+            --bg-card: #011a14;
+            --bg-card-hover: #012a20;
+            --accent: #a0df50;
+            --accent-glow: rgba(160, 223, 80, 0.3);
+            --accent-secondary: #f97316;
+            --accent-blue: #a0df50;
+            --accent-green: #a0df50;
+            --accent-purple: #f97316;
+            --text-primary: #f1f1f1;
+            --text-secondary: #9cb8a8;
+            --text-muted: #5a7a6a;
+            --border: rgba(160, 223, 80, 0.06);
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+
+        /* Animated Background */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-glow {
+            position: fixed;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.07;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-glow-1 { top: -200px; right: -200px; background: #a0df50; }
+        .bg-glow-2 { bottom: -200px; left: -200px; background: var(--accent-blue); }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(160, 223, 80, 0.1);
+            border: 1px solid rgba(160, 223, 80, 0.2);
+            border-radius: 100px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .hero-badge .dot {
+            width: 8px; height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--accent), #c8f080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .hero-stat .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator svg {
+            width: 24px; height: 24px;
+            stroke: var(--text-muted);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        /* Sections */
+        .section {
+            position: relative;
+            z-index: 1;
+            padding: 6rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-number {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Flow Diagram */
+        .flow {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .flow-step:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(255,255,255,0.1);
+            transform: translateX(-4px);
+        }
+
+        .flow-step .step-icon {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .flow-step .step-content h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .flow-step .step-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .flow-connector {
+            width: 2px;
+            height: 24px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            margin: 0 auto;
+            margin-right: calc(50% - 1px);
+        }
+
+        /* Color themes for different sections */
+        .theme-red .step-icon { background: rgba(160, 223, 80, 0.15); }
+        .theme-blue .step-icon { background: rgba(160, 223, 80, 0.12); }
+        .theme-green .step-icon { background: rgba(160, 223, 80, 0.1); }
+        .theme-purple .step-icon { background: rgba(249, 115, 22, 0.15); }
+        .theme-orange .step-icon { background: rgba(249, 115, 22, 0.12); }
+
+        /* Before/After */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .comparison-card {
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .comparison-card.before {
+            background: rgba(249, 115, 22, 0.05);
+            border-color: rgba(249, 115, 22, 0.15);
+        }
+
+        .comparison-card.after {
+            background: rgba(160, 223, 80, 0.05);
+            border-color: rgba(160, 223, 80, 0.15);
+        }
+
+        .comparison-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .comparison-card.before h4 { color: var(--accent-secondary); }
+        .comparison-card.after h4 { color: var(--accent); }
+
+        .comparison-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .comparison-card li {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .comparison-card li::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+
+        .comparison-card.before li::before { background: var(--accent-secondary); }
+        .comparison-card.after li::before { background: var(--accent); }
+
+        /* Dashboard Preview */
+        .dashboard-preview {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .dashboard-topbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+
+        .dashboard-body {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .dash-widget {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .dash-widget:hover {
+            background: rgba(255,255,255,0.05);
+            transform: translateY(-2px);
+        }
+
+        .dash-widget .widget-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .dash-widget .widget-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .dash-widget .widget-detail {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Animated bars */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 60px;
+            margin-top: 1rem;
+        }
+
+        .bar {
+            flex: 1;
+            border-radius: 4px 4px 0 0;
+            animation: grow-bar 1.5s ease forwards;
+            transform-origin: bottom;
+        }
+
+        @keyframes grow-bar {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-right: 3rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #a0df50, #f97316, #a0df50);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            right: -3.55rem;
+            top: 1.8rem;
+            width: 14px; height: 14px;
+            background: #a0df50;
+            border-radius: 50%;
+            border: 3px solid var(--bg-primary);
+        }
+
+        .timeline-item h4 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-item p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 6rem 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-card {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 4rem 3rem;
+            background: linear-gradient(135deg, rgba(160, 223, 80, 0.08), rgba(1, 48, 36, 0.3));
+            border: 1px solid rgba(160, 223, 80, 0.2);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(160, 223, 80, 0.05) 0%, transparent 70%);
+            animation: rotate-glow 10s linear infinite;
+        }
+
+        @keyframes rotate-glow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .cta-card h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .cta-card p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            position: relative;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 36px;
+            background: var(--accent);
+            color: #000000;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Heebo', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            text-decoration: none;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        /* Divider */
+        .section-divider {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            margin: 0 auto;
+            border-radius: 2px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.4s ease;
+        }
+
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .feature-card .card-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Whatsapp mockup */
+        .wa-mockup {
+            max-width: 380px;
+            margin: 2rem auto;
+            background: #0b141a;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .wa-header {
+            background: #1f2c34;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wa-avatar {
+            width: 36px; height: 36px;
+            background: #013024;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .wa-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .wa-status {
+            font-size: 0.75rem;
+            color: var(--accent-green);
+        }
+
+        .wa-chat {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 300px;
+        }
+
+        .wa-msg {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            animation: msg-appear 0.5s ease both;
+        }
+
+        .wa-msg.bot {
+            background: #1f2c34;
+            border-radius: 0 8px 8px 8px;
+            align-self: flex-start;
+        }
+
+        .wa-msg.user {
+            background: #005c4b;
+            border-radius: 8px 0 8px 8px;
+            align-self: flex-end;
+        }
+
+        .wa-msg .time {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.4);
+            text-align: left;
+            margin-top: 4px;
+        }
+
+        @keyframes msg-appear {
+            from { opacity: 0; transform: translateY(10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .wa-msg:nth-child(1) { animation-delay: 0.3s; }
+        .wa-msg:nth-child(2) { animation-delay: 0.8s; }
+        .wa-msg:nth-child(3) { animation-delay: 1.5s; }
+        .wa-msg:nth-child(4) { animation-delay: 2.2s; }
+        .wa-msg:nth-child(5) { animation-delay: 2.9s; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .comparison { grid-template-columns: 1fr; }
+            .dashboard-body { grid-template-columns: 1fr; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .hero-stats { flex-direction: column; gap: 1.5rem; }
+            .section { padding: 4rem 1.5rem; }
+            .timeline { padding-right: 2rem; }
+        }
+
+        /* Pulse animation for live indicators */
+        .live-pulse {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: var(--accent-green);
+        }
+
+        .live-pulse::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-badge">
+        <span class="dot"></span>
+        מערכת ניהול חכמה לערוץ 14
+    </div>
+    <h1>
+        70 עובדים. 7 צוותים.<br>
+        <span>מערכת אחת.</span>
+    </h1>
+    <p>
+        ניהול משמרות, החלפות, תקשורת ודיווח — הכל אוטומטי.
+        אתה רק מאשר.
+    </p>
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <div class="number">70</div>
+            <div class="label">עובדים</div>
+        </div>
+        <div class="hero-stat">
+            <div class="number">7</div>
+            <div class="label">צוותים</div>
+        </div>
+        <div class="hero-stat">
+            <div class="number">24/7</div>
+            <div class="label">מערכת פעילה</div>
+        </div>
+    </div>
+    <div class="scroll-indicator">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+    </div>
+</section>
+
+<!-- SECTION 1: WhatsApp Shift Bot -->
+<section class="section">
+    <div class="reveal">
+        <div class="section-header">
+            <div class="section-number">01 — איסוף אילוצים</div>
+            <h2 class="section-title">בוט וואטסאפ למשמרות</h2>
+            <p class="section-subtitle">
+                במקום 70 טלפונים — הודעה אחת אוטומטית.
+                העובד שולח את האילוצים, המערכת בונה סידור.
+            </p>
+        </div>
+
+        <div class="wa-mockup">
+            <div class="wa-header">
+                <div class="wa-avatar">🤖</div>
+                <div>
+                    <div class="wa-name">מנהל משמרות — ערוץ 14</div>
+                    <div class="wa-status">מקוון</div>
+                </div>
+            </div>
+            <div class="wa-chat">
+                <div class="wa-msg bot">
+                    שלום דני! 👋<br>
+                    שלח את האילוצים שלך לשבוע הבא<br>
+                    (ימים שאתה לא יכול או מעדיף שלא)
+                    <div class="time">09:00</div>
+                </div>
+                <div class="wa-msg user">
+                    יום שלישי לא יכול בכלל, חמישי רק בוקר
+                    <div class="time">09:02</div>
+                </div>
+                <div class="wa-msg bot">
+                    קיבלתי ✅<br>
+                    שלישי — לא זמין<br>
+                    חמישי — בוקר בלבד<br>
+                    <br>
+                    זה מדויק?
+                    <div class="time">09:02</div>
+                </div>
+                <div class="wa-msg user">
+                    כן מדויק 👍
+                    <div class="time">09:03</div>
+                </div>
+                <div class="wa-msg bot">
+                    מעולה! האילוצים נשמרו.<br>
+                    הסידור השבועי ישלח ביום ראשון בבוקר 📋
+                    <div class="time">09:03</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flow" style="margin-top: 3rem;">
+            <div class="flow-step theme-red">
+                <div class="step-icon">📩</div>
+                <div class="step-content">
+                    <h4>שלב 1 — הודעה אוטומטית</h4>
+                    <p>כל יום חמישי, הבוט שולח לכל 70 העובדים: "שלח אילוצים לשבוע הבא"</p>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step theme-red">
+                <div class="step-icon">🧠</div>
+                <div class="step-content">
+                    <h4>שלב 2 — AI מפרסר</h4>
+                    <p>העובד כותב בעברית חופשית. AI מבין ומתרגם לאילוצים מובנים</p>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step theme-red">
+                <div class="step-icon">📊</div>
+                <div class="step-content">
+                    <h4>שלב 3 — סידור אוטומטי</h4>
+                    <p>המערכת מייצרת סידור עבודה אופטימלי ל-7 צוותים לפי כל האילוצים</p>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step theme-red">
+                <div class="step-icon">✅</div>
+                <div class="step-content">
+                    <h4>שלב 4 — אישור ופרסום</h4>
+                    <p>שקד מקבל טיוטה, מאשר או מתקן → הסידור יוצא לכל העובדים בוואטסאפ</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison">
+            <div class="comparison-card before">
+                <h4>❌ היום</h4>
+                <ul>
+                    <li>מתקשר ל-70 עובדים אחד אחד</li>
+                    <li>מקבל הודעות בכל שעה מכל כיוון</li>
+                    <li>בונה סידור ידנית באקסל</li>
+                    <li>שעות עבודה כל שבוע</li>
+                </ul>
+            </div>
+            <div class="comparison-card after">
+                <h4>✅ אחרי</h4>
+                <ul>
+                    <li>בוט אוסף אילוצים אוטומטית</li>
+                    <li>הכל נכנס למקום אחד מסודר</li>
+                    <li>סידור נבנה אוטומטית</li>
+                    <li>שקד רק מאשר — 10 דקות</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SECTION 2: Replacement Finder -->
+<section class="section">
+    <div class="reveal">
+        <div class="section-header">
+            <div class="section-number">02 — החלפות אוטומטיות</div>
+            <h2 class="section-title">מוצא מחליף תוך דקות</h2>
+            <p class="section-subtitle">
+                עובד לא יכול להגיע? המערכת מוצאת מחליף בלי שאתה מרים טלפון.
+            </p>
+        </div>
+
+        <div class="flow">
+            <div class="flow-step theme-blue">
+                <div class="step-icon">🚫</div>
+                <div class="step-content">
+                    <h4>עובד מודיע שלא יכול</h4>
+                    <p>שולח הודעה לבוט: "לא יכול מחר" — בכל שעה, מכל מקום</p>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step theme-blue">
+                <div class="step-icon">🔍</div>
+                <div class="step-content">
+                    <h4>המערכת בודקת מי פנוי</h4>
+                    <p>סורקת את הסידור, מזהה עובדים פנויים מאותו צוות ומתאימים למשמרת</p>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step theme-blue">
+                <div class="step-icon">📲</div>
+                <div class="step-content">
+                    <h4>שולחת בקשה לפנויים</h4>
+                    <p>"יש משמרת פנויה מחר בוקר 06:00-14:00. מעוניין?" — ראשון שעונה כן מקבל</p>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step theme-blue">
+                <div class="step-icon">🔔</div>
+                <div class="step-content">
+                    <h4>שקד מקבל עדכון</h4>
+                    <p>"דני החליף את יוסי במשמרת בוקר מחר — טופל אוטומטית ✅"</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-grid" style="margin-top: 3rem;">
+            <div class="feature-card">
+                <div class="card-icon">⚡</div>
+                <h4>זמן תגובה</h4>
+                <p>מדקות ספורות במקום שעות של טלפונים. המערכת עובדת 24/7.</p>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">⚖️</div>
+                <h4>חלוקה הוגנת</h4>
+                <p>המערכת מאזנת — מי שהחליף פחות מקבל עדיפות. אין מצב שתמיד אותו אחד.</p>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">📜</div>
+                <h4>תיעוד מלא</h4>
+                <p>כל החלפה מתועדת — מי ביטל, מי החליף, מתי. שקד רואה היסטוריה מלאה.</p>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">🔄</div>
+                <h4>אסקלציה חכמה</h4>
+                <p>אם אף אחד לא פנוי מהצוות — המערכת מרחיבה חיפוש לצוותים סמוכים.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SECTION 3: Complaint Inbox -->
+<section class="section">
+    <div class="reveal">
+        <div class="section-header">
+            <div class="section-number">03 — תיבת פניות חכמה</div>
+            <h2 class="section-title">תלונות וגחמות?<br>הכל מסודר במקום אחד</h2>
+            <p class="section-subtitle">
+                במקום הודעות מכל כיוון — מערכת שמקטלגת, מתעדפת, ועונה תשובות אוטומטיות לשאלות חוזרות.
+            </p>
+        </div>
+
+        <div class="flow">
+            <div class="flow-step theme-green">
+                <div class="step-icon">💬</div>
+                <div class="step-content">
+                    <h4>פנייה דרך הבוט</h4>
+                    <p>עובד שולח: "אני צריך לשנות משמרת" / "יש בעיה עם הציוד" / "מה המשמרת שלי מחר?"</p>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step theme-green">
+                <div class="step-icon">🏷️</div>
+                <div class="step-content">
+                    <h4>קיטלוג אוטומטי</h4>
+                    <p>AI מקטלג: דחיפות (גבוהה/רגילה), סוג (משמרות/ציוד/אישי/אחר), צוות</p>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step theme-green">
+                <div class="step-icon">🤖</div>
+                <div class="step-content">
+                    <h4>תשובות אוטומטיות</h4>
+                    <p>"מה המשמרת שלי?" — הבוט עונה מיד מתוך הסידור. לא צריך את שקד בכלל.</p>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step theme-green">
+                <div class="step-icon">📋</div>
+                <div class="step-content">
+                    <h4>רשימת טיפול לשקד</h4>
+                    <p>פניות שדורשות החלטה אנושית — מגיעות מסודרות לפי דחיפות. שקד מטפל כשפנוי.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-grid" style="margin-top: 3rem;">
+            <div class="feature-card">
+                <div class="card-icon">🔁</div>
+                <h4>שאלות חוזרות</h4>
+                <p>"מה המשמרת שלי?" / "כמה שעות עבדתי?" / "מתי יוצא הסידור?" — נענות אוטומטית, 0 עבודה.</p>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">🚨</div>
+                <h4>דחוף = מיידי</h4>
+                <p>פנייה דחופה מגיעה לשקד בהודעה מיידית עם סיכום קצר. לא מתפספס.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SECTION 4: Dashboard -->
+<section class="section">
+    <div class="reveal">
+        <div class="section-header">
+            <div class="section-number">04 — דשבורד ניהולי</div>
+            <h2 class="section-title">מסך אחד. שליטה מלאה.</h2>
+            <p class="section-subtitle">
+                כל 7 הצוותים, כל המשמרות, כל הפניות — במבט אחד.
+                דוחות מוכנים להנהלה בלחיצה.
+            </p>
+        </div>
+
+        <div class="dashboard-preview">
+            <div class="dashboard-topbar">
+                <div class="topbar-dot" style="background: #a0df50;"></div>
+                <div class="topbar-dot" style="background: #ffbd2e;"></div>
+                <div class="topbar-dot" style="background: #28ca42;"></div>
+                <span style="margin-right: auto; font-size: 0.8rem; color: var(--text-muted);">ShiftMaster — ערוץ 14</span>
+                <span class="live-pulse">LIVE</span>
+            </div>
+            <div class="dashboard-body">
+                <div class="dash-widget">
+                    <div class="widget-label">עובדים במשמרת היום</div>
+                    <div class="widget-value" style="color: #a0df50;">47</div>
+                    <div class="widget-detail">מתוך 52 מתוכננים</div>
+                </div>
+                <div class="dash-widget">
+                    <div class="widget-label">החלפות החודש</div>
+                    <div class="widget-value" style="color: #a0df50;">23</div>
+                    <div class="widget-detail">18 טופלו אוטומטית</div>
+                </div>
+                <div class="dash-widget">
+                    <div class="widget-label">פניות פתוחות</div>
+                    <div class="widget-value" style="color: #f97316;">4</div>
+                    <div class="widget-detail">1 דחופה</div>
+                </div>
+                <div class="dash-widget">
+                    <div class="widget-label">אחוז אילוצים שנשלחו</div>
+                    <div class="widget-value" style="color: #a0df50;">89%</div>
+                    <div class="widget-detail">62 מתוך 70 עובדים</div>
+                    <div class="bar-chart">
+                        <div class="bar" style="height: 30%; background: #a0df50; opacity: 0.4;"></div>
+                        <div class="bar" style="height: 45%; background: #a0df50; opacity: 0.5;"></div>
+                        <div class="bar" style="height: 60%; background: #a0df50; opacity: 0.6;"></div>
+                        <div class="bar" style="height: 72%; background: #a0df50; opacity: 0.7;"></div>
+                        <div class="bar" style="height: 80%; background: #a0df50; opacity: 0.8;"></div>
+                        <div class="bar" style="height: 89%; background: #a0df50; opacity: 0.9;"></div>
+                        <div class="bar" style="height: 100%; background: #a0df50;"></div>
+                    </div>
+                </div>
+                <div class="dash-widget">
+                    <div class="widget-label">צוות הכי יציב</div>
+                    <div class="widget-value" style="font-size: 1.3rem;">צוות אבטחה</div>
+                    <div class="widget-detail">0 ביטולים החודש</div>
+                </div>
+                <div class="dash-widget">
+                    <div class="widget-label">שעות שנחסכו החודש</div>
+                    <div class="widget-value" style="color: #a0df50;">~12</div>
+                    <div class="widget-detail">שעות ניהול שחסך הבוט</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-grid" style="margin-top: 2rem;">
+            <div class="feature-card">
+                <div class="card-icon">📈</div>
+                <h4>דפוסים חכמים</h4>
+                <p>מי מבטל הכי הרבה? איזו משמרת הכי קשה לאייש? איזה צוות הכי יציב? תובנות שעוזרות להחלטות.</p>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">📄</div>
+                <h4>דוחות להנהלה</h4>
+                <p>דוח שבועי/חודשי מוכן — נוכחות, החלפות, חריגות. שקד לוחץ כפתור ושולח למנהל מעליו.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SECTION 5: Communication -->
+<section class="section">
+    <div class="reveal">
+        <div class="section-header">
+            <div class="section-number">05 — תקשורת אוטומטית</div>
+            <h2 class="section-title">שקד לא צריך לכתוב</h2>
+            <p class="section-subtitle">
+                תזכורות, עדכונים, שינויים — הכל יוצא אוטומטית.
+                לכל 70 העובדים או לצוות ספציפי.
+            </p>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item reveal">
+                <h4>📋 יום ראשון 07:00 — סידור שבועי</h4>
+                <p>"הסידור לשבוע הזה פורסם — לחץ כאן לראות את המשמרות שלך"</p>
+            </div>
+            <div class="timeline-item reveal">
+                <h4>⏰ יום לפני משמרת — תזכורת</h4>
+                <p>"מחר יש לך משמרת בוקר 06:00-14:00. אם אתה לא יכול — שלח 'לא יכול' ואני אמצא מחליף"</p>
+            </div>
+            <div class="timeline-item reveal">
+                <h4>🔄 שינוי בסידור — עדכון מיידי</h4>
+                <p>"שים לב: המשמרת שלך ביום רביעי השתנתה מצהריים לבוקר"</p>
+            </div>
+            <div class="timeline-item reveal">
+                <h4>📢 הודעה גורפת — לחצן אחד</h4>
+                <p>שקד רוצה להעביר מסר לכל העובדים / לצוות ספציפי? כותב פעם אחת, הבוט מפיץ.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="reveal">
+        <div class="cta-card">
+            <h2>מוכן לראות את זה בפעולה?</h2>
+            <p>
+                המערכת מותאמת בדיוק ל-7 הצוותים שלך,
+                ל-70 העובדים, ולסוגי המשמרות בערוץ.
+            </p>
+            <a href="https://wa.me/972547801787" class="cta-button">
+                בוא נדבר ←
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <p>נבנה על ידי רפאל הרוש | 2026 ©</p>
+</footer>
+
+<script>
+    // Scroll reveal
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Animate numbers on scroll
+    function animateValue(el, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const current = Math.floor(progress * (end - start) + start);
+            el.textContent = current;
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                el.textContent = end;
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Animate hero stats
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const numbers = entry.target.querySelectorAll('.number');
+                numbers.forEach(num => {
+                    const text = num.textContent;
+                    if (text === '24/7') return;
+                    const value = parseInt(text);
+                    if (!isNaN(value)) {
+                        animateValue(num, 0, value, 1500);
+                    }
+                });
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.hero-stats').forEach(el => statsObserver.observe(el));
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // WhatsApp chat animation - replay on scroll
+    const waObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const msgs = entry.target.querySelectorAll('.wa-msg');
+                msgs.forEach((msg, i) => {
+                    msg.style.animation = 'none';
+                    msg.offsetHeight; // trigger reflow
+                    msg.style.animation = `msg-appear 0.5s ease ${0.3 + i * 0.7}s both`;
+                });
+            }
+        });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('.wa-mockup').forEach(el => waObserver.observe(el));
+</script>
+
+</body>
+</html>
